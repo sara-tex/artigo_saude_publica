@@ -1,0 +1,24 @@
+---
+title: "analises_inferenciais"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+
+df <- read.csv("dados-limpo.csv")
+
+```
+
+```{r}
+
+df |>
+  cor.test()
+```
+
