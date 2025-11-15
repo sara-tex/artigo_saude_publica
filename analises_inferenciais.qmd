@@ -10,36 +10,34 @@ editor_options:
 library(tidyverse)
 library(ggrepel)
 library(rstatix)
+library(summarytools)
 ```
 
 ```{r}
-
-df <- read.csv("dados-limpo.csv")
-
+df <- read_csv("dados-limpo.csv") |> 
+  filter(nivel_atencao %in% c("atenção primária", "atenção secundária", "atenção terciária"))
 ```
 
 ```{r}
-#teste t da proporção entre homens e mulheres em cada nível de atenção
+df |> 
+  count(genero) |> 
+  mutate(
+    prop = n / sum(n) * 100
+  ) 
 
-tabela_qui_nivel <- table(df$genero, df$nivel_atencao)
-
-result_qui_niveis <- print(chisq.test(tabela_qui_nivel))
-
-result_qui_niveis$stdres
-
-
+#ver diferença de gênero geral (teste T)
 ```
 
 ```{r}
-##teste t da proporção entre homens e mulheres em cada região
+# quantidade de psicólogos em cada região por nível de atenção
+df |> 
+  count(regiao, nivel_atencao) |> 
+  pivot_wider(names_from = nivel_atencao, values_from = n, id_cols = regiao) 
+```
 
-tabela_qui_regiao <- table(df$genero, df$regiao)
-
-result_qui_regiao <- chisq.test(tabela_qui_regiao)
-
-result_qui_regiao$stdres
-  
-
+```{r}
+# tabela de contingência e teste de qui-quadrado da quantidade de vínculos em cada região por nível de atenção
+ctable(x = df$regiao, y = df$nivel_atencao, chisq = T)
 ```
 
 ```{r}
@@ -56,8 +54,8 @@ df_prop <- df |>
   ) |>
   ungroup()
 
+## fazer a análise por estado
 ```
-
 
 ```{r}
 
@@ -92,6 +90,28 @@ TukeyHSD(modelo_regiao)
 
 ```
 
+```{r}
+#anova entre regiões (proporção por região)
+
+##-> os pressupostos não foram acatados. precisa refazer anova
+
+modelo_regiao <- aov(prop_psi_muni ~ regiao, data = df_prop)
+
+summary(modelo_regiao)
+
+TukeyHSD(modelo_regiao)
+```
+
+centro-oeste tem menos psicólos por população do que o sudeste proporcionalmente
+nordeste tem mais psicólogos por população que o norte
+nordeste tem menos psicólogos por pop do que o sudeste
+nordeste tem menos psicólogos por pop do que o sul
+norte tem menos psicólogos por pop do que o sudeste
+
+norte tem menos psicólogos por pop do que o sul
+e o sudeste tem menos psicólogos por população do que o sul
+
+#verificar a prevalência de psicólogos por nível de atenção em cada região (ex.: nordeste tem mais psicólogos na atenção primária que sudeste?)
 
 ```{r}
 #anova entre estados
@@ -109,14 +129,14 @@ TukeyHSD(modelo_estado)
 
 ## --> que função usar pra verificar os pressupostos?
 
-cor.test(df_prop$populacao_muni, df_prop$quanti_psis_muni, method = "pearson")
+cor.test(df_prop$populacao_muni, df_prop$prop_psi_muni, method = "pearson")
 
 ```
 
 ```{r}
 library(ggplot2)
 
-ggplot(df_prop, aes(x = populacao_muni, y = quanti_psis_muni)) +
+ggplot(df_prop, aes(x = populacao_muni, y = prop_psi_muni)) +
   geom_point(alpha = 0.6, color = "black") +
   geom_smooth(method = "lm", se = FALSE, color = "gray") + 
   geom_text_repel(
@@ -129,9 +149,9 @@ ggplot(df_prop, aes(x = populacao_muni, y = quanti_psis_muni)) +
     max.overlaps = Inf) +labs(
     title = "Correlação entre População e Psicólogos",
     x = "População do Município",
-    y = "Vínculos de Psicólogos)"
+    y = "Proporção de Psicólogos"
   ) +
   theme_minimal()
 ```
-```
+
 
