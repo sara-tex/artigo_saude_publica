@@ -11,6 +11,8 @@ library(tidyverse)
 library(ggrepel)
 library(rstatix)
 library(summarytools)
+library(nortest)
+library(MKinfer)
 ```
 
 ```{r}
@@ -25,8 +27,44 @@ df |>
     prop = n / sum(n) * 100
   ) 
 
-#ver diferença de gênero geral (teste T)
+
 ```
+
+```{r}
+# teste t para gênero
+## considerar apenas um vínculo por psicólogo
+vinculos_unicos <- df |> 
+  filter(!is.na(genero)) |> 
+  group_by(codigo_profissional_saude, genero) |> 
+  summarise(
+    n_vinculos = n(),
+    .groups = 'drop'
+  )
+
+## testando pressupostos
+### normalidade
+norm_mulher <- vinculos_unicos |>
+  filter(genero == "Female") |> 
+  pull(n_vinculos) |> 
+  lillie.test()
+
+norm_homens <- vinculos_unicos |> 
+  filter(genero == "Male") |> 
+  pull(n_vinculos) |> 
+  lillie.test()
+### homogeneidade de variâncias
+levene_test(vinculos_unicos, formula = n_vinculos ~ genero)
+### bootstrap
+boot_t_vinculos <- boot.t.test(formula = n_vinculos ~ genero, data = vinculos_unicos, 
+                     R= 1000)
+```
+
+
+Usando o pacote genderBR, categorizou-se 59.286 vínculos como de mulheres ("Female"), 11.492 eram homens ("Male"), mas não foi possível categorizar 2.745 vínculos quanto ao gênero, sendo estes excluódos do banco de dados para proceder à análise da diferença de média por meio do teste t de Student.
+
+Em razão do não atendimento ao pressuposto de normalidade, procedeu ao procedimento de bootstrap com 1000 reamostragens para verficar se há uma média de vinculos maior para homens ou mulheres. Constatou-se diferença estatisticamente significativa entre os grupos (t (13081) = -2,3965; p-value = 0.01657), no sentido de que há um número de médio maior para os homens do que para as mulheres. 
+
+
 
 ```{r}
 # quantidade de psicólogos em cada região por nível de atenção
