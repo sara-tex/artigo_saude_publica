@@ -11,19 +11,29 @@ library(janitor)
 ```
 
 ```{r}
-df <- read.csv("data/dados-limpo.csv") |> 
+df <- read_csv("dados-limpo.csv") |> 
   as_tibble()
 ```
+
+```{r}
+df |> 
+  count(nivel_atencao) |> 
+  mutate(
+    prop = n/sum(n) * 100
+  )
+```
+
+Conforme tabela X, Os estabelecimentos indicados no banco de dados foram classificados como assistenciais, logísticos e de apoio, a partir da portaria XXXX que define XXXX.Foram mantidos apenas os casos pertinentes aos níveis assistenciais (primário, secundário e terciária), tendo sido retirados estabelecimentos ligados a sistemas de apoio (n = 794) e logísticos (n = 1462). 
 
 ```{r}
 # Filtrar apenas níveis assistenciais
 df <- df |> 
   clean_names() |> 
   filter(
-    nivel_atencao == "atenção primária" | nivel_atencao == "atenção secundária" | nivel_atencao == "atenção terciária"
+    nivel_atencao %in% c("atenção primária", "atenção secundária", "atenção terciária") 
   ) |> 
   select(
-    -x
+    -1
   ) 
 ```
 
@@ -35,6 +45,15 @@ df |>
   mutate(
     prop = n / sum(n) * 100
   )
+```
+
+```{r}
+df |> 
+  count(nivel_atencao, estabelecimento, sort = T) |> 
+  mutate(
+    prop = n/sum(n)*100
+  ) |>
+  arrange(nivel_atencao) 
 ```
 
 ```{r}
@@ -106,8 +125,7 @@ df |>
   mutate(
     prop = n / sum(n),
     .by = estado
-  ) |> 
-  View()
+  ) 
 ```
 
 ```{r}
@@ -128,4 +146,3 @@ df |>
     .by = regiao
   )
 ```
-
