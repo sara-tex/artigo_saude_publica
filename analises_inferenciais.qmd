@@ -162,16 +162,26 @@ TukeyHSD(modelo_estado)
   
 ```
 
+Procedeu-se a uma análise de correlação no sentido de avaliar a relação entre a população do município e a proporção da quantidade de habitantes por psicólogo. Em razão do não atendimento do pressuposto de normalidade, foi realizada o teste de correlação de Spearman, cuja resultado indicou associação positiva e significativa (r(5484) = 0,33; p < 0,001), o que sugere que quanto mais pessoas residem no município, maior a demanda que os profissionais precisam atender. 
+
 ```{r}
 #correlação entre população e nº de vínculos
 
 ## testando pressupostos
 ### normalidade 
+#### populacao_muni
+norm_pop_muni <- df_prop |> 
+  pull(populacao_muni) |> 
+  lillie.test()
+
+norm_prop_psi_muni <- df_prop |> 
+  pull(prop_psi_muni) |> 
+  lillie.test()
 
 
 ## --> que função usar pra verificar os pressupostos?
 
-cor.test(df_prop$populacao_muni, df_prop$prop_psi_muni, method = "pearson")
+cor.test(df_prop$populacao_muni, df_prop$prop_psi_muni, method = "spearman")
 
 ```
 
