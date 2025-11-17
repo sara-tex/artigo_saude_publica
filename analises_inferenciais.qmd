@@ -80,9 +80,9 @@ ctable(x = df$regiao, y = df$nivel_atencao, chisq = T)
 
 ```{r}
 #variável de proporção: "nº de habitantes por profissional de psicologia"
- 
+## agrupando por municipio para não contar municipio mais de uma vez 
 df_prop <- df |>
-  group_by(nome_do_municipio, regiao, estado) |> 
+  group_by(codigo_municipio, nome_do_municipio, regiao, estado) |> 
   summarise(
     populacao_muni = first(populacao_muni), 
     # n() agora contará corretamente centenas ou milhares de linhas para SP
@@ -164,6 +164,10 @@ TukeyHSD(modelo_estado)
 
 ```{r}
 #correlação entre população e nº de vínculos
+
+## testando pressupostos
+### normalidade 
+
 
 ## --> que função usar pra verificar os pressupostos?
 
