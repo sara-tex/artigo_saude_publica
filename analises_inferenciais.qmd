@@ -131,8 +131,6 @@ TukeyHSD(modelo_regiao)
 ```{r}
 #anova entre regiões (proporção por região)
 
-##-> os pressupostos não foram acatados. precisa refazer anova
-
 modelo_regiao <- aov(prop_psi_muni ~ regiao, data = df_prop)
 
 summary(modelo_regiao)
@@ -144,7 +142,19 @@ lillie.test(residuals(modelo_regiao))
 # testando homogeneidade de variâncias
 levene_test(prop_psi_muni ~ regiao, data = df_prop)
 # Anova de Welch (robusta à falta de homogeneidade de variância)
-
+welch_anova <- oneway.test(prop_psi_muni ~ regiao, 
+                           data = df_prop, 
+                           var.equal = FALSE)
+# Teste Post-Hoc de Games-Howell
+post_hoc_anova <- df_prop |> 
+  games_howell_test(prop_psi_muni ~ regiao) 
+# tamanho de efeito global Eta Quadrado
+efeito_global_anova <- eta_squared(modelo_regiao)
+# taamnho de efeito das comparações 
+efeito_regioes <- df_prop |> 
+  cohens_d(prop_psi_muni ~ regiao,
+           paired = F,
+           hedges.correction = T) 
 # Bootstrapping (robusto à falta de normalidade dos resíduos)
 ```
 
