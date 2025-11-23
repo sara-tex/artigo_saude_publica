@@ -6,6 +6,7 @@ editor_options:
   chunk_output_type: console
 ---
 
+
 ```{r}
 library(tidyverse)
 library(ggrepel)
@@ -137,8 +138,7 @@ modelo_regiao <- aov(prop_psi_muni ~ regiao, data = df_prop)
 
 summary(modelo_regiao)
 
-TukeyHSD(modelo_regiao)
-
+TukeyHSD(modelo_regiao) 
 # testando pressuposto de normalidade de resíduos
 lillie.test(residuals(modelo_regiao))
 # testando homogeneidade de variâncias
