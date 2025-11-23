@@ -13,6 +13,8 @@ library(rstatix)
 library(summarytools)
 library(nortest)
 library(MKinfer)
+library(boot)
+library(purrr)
 ```
 
 ```{r}
@@ -156,6 +158,35 @@ efeito_regioes <- df_prop |>
            paired = F,
            hedges.correction = T) 
 # Bootstrapping (robusto à falta de normalidade dos resíduos)
+## pares de regiões
+pares_regioes <- combn(unique(df_prop$regiao), 2, simplify = F)
+## 2. Função para realizar o teste bootstrap e extrair o p-value
+rodar_boot_test <- function(par) {
+  grupo1 <- par[1]
+  grupo2 <- par[2]
+  
+  dados_par <- df_prop |> 
+    filter(regiao %in% c(grupo1, grupo2))
+  
+  test_boot <- boot.t.test(
+    prop_psi_muni ~ regiao,
+    data = dados_par,
+    R = 2000,
+    alternative = "two.sided"
+  )
+  
+  data.frame(
+    group1 = grupo1,
+    group2 = grupo2,
+    p.value = test_boot$p.value
+  )
+}
+## 3. aplicar a função aos pares e mostrar os resultados com p-value
+boot_anova <- do.call(rbind, lapply(pares_regioes, rodar_boot_test))
+
+## 4. Aplicar a correção de Holm para mostrar valor de p
+boot_anova_holm <- boot_anova |> 
+  mutate(p.adj.holm = p.adjust(p.value, method = "holm"))
 ```
 
 Não houve normalidade dos resíduos nem homogeneidade de variâncias. 
