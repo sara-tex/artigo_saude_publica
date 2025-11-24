@@ -30,22 +30,6 @@ df |>
   )
 ```
 
-
-```{r}
-```
-
-
-```{r}
-```
-
-
-```{r}
-```
-
-
-```{r}
-```
-
 ```{r}
 # teste t para gênero
 ## considerar apenas um vínculo por psicólogo
