@@ -140,53 +140,35 @@ descritiva_anova <- df_prop |>
   select(regiao, n, mean, sd)
 
 # Anova de Welch (robusta à falta de homogeneidade de variância)
-welch_anova <- oneway.test(prop_psi_muni ~ regiao, 
-                           data = df_prop, 
-                           var.equal = FALSE)
+welch_anova <- welch_anova_test(prop_psi_muni ~ regiao, 
+                           data = df_prop)
 
 # tamanho de efeito global Eta Quadrado
 efeito_global_anova <- eta_squared(modelo_regiao)
 
 # Teste Post-Hoc de Games-Howell
-post_hoc_anova <- df_prop |> 
-  games_howell_test(prop_psi_muni ~ regiao) 
+gh <- games_howell_test(prop_psi_muni ~ regiao, data = df_prop)
+
+# Função para bootstrapping
+fun_gh <- function(data, indices){
+  games_howell_test(prop_psi_muni ~ regiao, data = data[indices, ])$estimate
+}
+
+# Realizando o bootstrapping
+set.seed(123)
+boot_gh <- boot::boot(data= df_prop, statistic= fun_gh, R=2000)
+
+# Substituindo os valores do IC
+post_hoc <- gh |> 
+  select(-p.adj:-p.adj.signif) |>  
+  mutate(
+    conf.low= confint(boot_gh, type= "bca")[,1],
+    conf.high= confint(boot_gh, type= "bca")[,2]
+    )
 
 # tamanho de efeito das comparações 
-efeito_regioes <- df_prop |> 
-  cohens_d(prop_psi_muni ~ regiao,
-           paired = F,
-           hedges.correction = T) 
-
-# Bootstrapping (robusto à falta de normalidade dos resíduos)
-## pares de regiões
-pares_regioes <- combn(unique(df_prop$regiao), 2, simplify = F)
-## 2. Função para realizar o teste bootstrap e extrair o p-value
-rodar_boot_test <- function(par) {
-  grupo1 <- par[1]
-  grupo2 <- par[2]
-  
-  dados_par <- df_prop |> 
-    filter(regiao %in% c(grupo1, grupo2))
-  
-  test_boot <- boot.t.test(
-    prop_psi_muni ~ regiao,
-    data = dados_par,
-    R = 2000,
-    alternative = "two.sided"
-  )
-  
-  data.frame(
-    group1 = grupo1,
-    group2 = grupo2,
-    p.value = test_boot$p.value
-  )
-}
-## 3. aplicar a função aos pares e mostrar os resultados com p-value
-boot_anova <- do.call(rbind, lapply(pares_regioes, rodar_boot_test))
-
-## 4. Aplicar a correção de Holm para mostrar valor de p
-boot_anova_holm <- boot_anova |> 
-  mutate(p.adj.holm = p.adjust(p.value, method = "holm"))
+set.seed(123) 
+efeito_regioes <- cohens_d(prop_psi_muni ~ regiao, data = df_prop, ci = T, ci.type = "bca", nboot = 2000)
 ```
 
 Não houve normalidade dos resíduos nem homogeneidade de variâncias. 
