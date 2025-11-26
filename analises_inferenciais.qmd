@@ -15,6 +15,9 @@ library(nortest)
 library(MKinfer)
 library(boot)
 library(purrr)
+library(emmeans)
+library(flextable)
+library(easystats)
 ```
 
 ```{r}
@@ -125,31 +128,20 @@ welch_anova <- welch_anova_test(prop_psi_muni ~ regiao,
                            data = df_prop)
 
 # tamanho de efeito global Eta Quadrado
-efeito_global_anova <- eta_squared(modelo_regiao)
+efeito_global_anova <- omega_squared(modelo_regiao)
 
-# Teste Post-Hoc de Games-Howell
-gh <- games_howell_test(prop_psi_muni ~ regiao, data = df_prop)
+# post-hoc
+post_hoc <- df_prop |> 
+  games_howell_test(
+    prop_psi_muni ~ regiao
+  )
 
-# Função para bootstrapping
-fun_gh <- function(data, indices){
-  games_howell_test(prop_psi_muni ~ regiao, data = data[indices, ])$estimate
-}
-
-# Realizando o bootstrapping
-set.seed(123)
-boot_gh <- boot::boot(data= df_prop, statistic= fun_gh, R=2000)
-
-# Substituindo os valores do IC
-post_hoc <- gh |> 
-  select(-p.adj:-p.adj.signif) |>  
-  mutate(
-    conf.low= confint(boot_gh, type= "bca")[,1],
-    conf.high= confint(boot_gh, type= "bca")[,2]
-    )
-
-# tamanho de efeito das comparações 
-set.seed(123) 
-efeito_regioes <- cohens_d(prop_psi_muni ~ regiao, data = df_prop, ci = T, ci.type = "bca", nboot = 2000)
+#efeito par a par
+efeito_anova <- df_prop |> 
+  cohens_d(
+    prop_psi_muni ~ regiao,
+    hedges.correction = T
+  )
 ```
 
 Não houve normalidade dos resíduos nem homogeneidade de variâncias. 
@@ -164,17 +156,6 @@ norte tem menos psicólogos por pop do que o sul
 e o sudeste tem menos psicólogos por população do que o sul
 
 #verificar a prevalência de psicólogos por nível de atenção em cada região (ex.: nordeste tem mais psicólogos na atenção primária que sudeste?)
-
-```{r}
-#anova entre estados
-
-modelo_estado <- aov(prop_psi_muni ~ estado, data = df_prop)
-
-summary(modelo_estado)
-
-TukeyHSD(modelo_estado)
-  
-```
 
 Procedeu-se a uma análise de correlação no sentido de avaliar a relação entre a população do município e a proporção da quantidade de habitantes por psicólogo. Em razão do não atendimento do pressuposto de normalidade, foi realizada o teste de correlação de Spearman, cuja resultado indicou associação positiva e significativa (r(5484) = 0,33; p < 0,001), o que sugere que quanto mais pessoas residem no município, maior a demanda que os profissionais precisam atender. 
 
