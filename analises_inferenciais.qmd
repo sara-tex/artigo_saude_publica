@@ -15,9 +15,8 @@ library(nortest)
 library(MKinfer)
 library(boot)
 library(purrr)
-library(emmeans)
-library(flextable)
-library(easystats)
+#library(emmeans)
+#library(easystats)
 ```
 
 ```{r}
@@ -128,20 +127,30 @@ welch_anova <- welch_anova_test(prop_psi_muni ~ regiao,
                            data = df_prop)
 
 # tamanho de efeito global Eta Quadrado
-efeito_global_anova <- omega_squared(modelo_regiao)
+efeito_global_anova <- effectsize::omega_squared(modelo_regiao, alternative = "two.sided")
 
-# post-hoc
-post_hoc <- df_prop |> 
-  games_howell_test(
-    prop_psi_muni ~ regiao
-  )
+# Teste Post-Hoc de Games-Howell
+post_hoc_anova <- df_prop |> 
+  games_howell_test(prop_psi_muni ~ regiao) 
 
-#efeito par a par
-efeito_anova <- df_prop |> 
-  cohens_d(
-    prop_psi_muni ~ regiao,
-    hedges.correction = T
-  )
+# tamanho de efeito das comparações 
+efeito_regioes <- df_prop |> 
+  cohens_d(prop_psi_muni ~ regiao,
+           paired = F,
+           hedges.correction = T) 
+
+# Bootstrap (DEU ERRO NO TAMANHO DE EFEITO)
+#set.seed(123) # Para reprodutibilidade
+#marginal_means <- bootstrap_model(modelo_regiao, iterations = 2000) |> 
+  #emmeans( ~ regiao)
+
+#contrastes <-marginal_means |> 
+ # contrast( method = "pairwise",  adjust = "holm") |> 
+  #parameters(bootstrap = TRUE, ci_method = "bci")
+
+# tamanho de efeito com reamostragem
+#set.seed(123)
+#eff <- cohens_d(prop_psi_muni ~ regiao, data = df_prop, ci = T, ci.type = "bca", nboot = 2000)
 ```
 
 Não houve normalidade dos resíduos nem homogeneidade de variâncias. 
@@ -200,5 +209,3 @@ ggplot(df_prop, aes(x = populacao_muni, y = prop_psi_muni)) +
   ) +
   theme_minimal()
 ```
-
-
