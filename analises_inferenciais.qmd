@@ -140,17 +140,17 @@ efeito_regioes <- df_prop |>
            hedges.correction = T) 
 
 # Bootstrap (DEU ERRO NO TAMANHO DE EFEITO)
-#set.seed(123) # Para reprodutibilidade
-#marginal_means <- bootstrap_model(modelo_regiao, iterations = 2000) |> 
-  #emmeans( ~ regiao)
+set.seed(123) # Para reprodutibilidade
+marginal_means <- parameters::bootstrap_model(modelo_regiao, iterations = 2000) |> 
+  emmeans::emmeans( ~ regiao)
 
-#contrastes <-marginal_means |> 
- # contrast( method = "pairwise",  adjust = "holm") |> 
-  #parameters(bootstrap = TRUE, ci_method = "bci")
+contrastes <- marginal_means |> 
+ emmeans::contrast( method = "pairwise",  adjust = "holm") |> 
+  parameters::parameters(bootstrap = TRUE, ci_method = "bci")
 
 # tamanho de efeito com reamostragem
-#set.seed(123)
-#eff <- cohens_d(prop_psi_muni ~ regiao, data = df_prop, ci = T, ci.type = "bca", nboot = 2000)
+set.seed(123)
+efeito_anova_boot <- cohens_d(data = df_prop, prop_psi_muni ~ regiao, var.equal = F, ci = T, ci.type = "bca", nboot = 2000)
 ```
 
 Não houve normalidade dos resíduos nem homogeneidade de variâncias. 
