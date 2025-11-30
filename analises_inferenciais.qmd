@@ -153,6 +153,10 @@ set.seed(123)
 efeito_anova_boot <- cohens_d(data = df_prop, prop_psi_muni ~ regiao, var.equal = F, ci = T, ci.type = "bca", nboot = 2000)
 ```
 
+```{r}
+# ANOVA fatorial da distribuição de psicólogos considerando nivel de atenção e região
+```
+
 Não houve normalidade dos resíduos nem homogeneidade de variâncias. 
 
 centro-oeste tem menos psicólos por população do que o sudeste proporcionalmente
