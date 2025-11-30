@@ -20,30 +20,57 @@ library(purrr)
 ```
 
 ```{r}
+#importando o dataframe
+
 df <- read_csv("dados-limpo.csv") |> 
   filter(nivel_atencao %in% c("atenção primária", "atenção secundária", "atenção terciária"))
 ```
 
 ```{r}
+#proporção de gênero (isso é pra ficar nas descritivas)
+
 df |> 
   count(genero) |> 
   mutate(
     prop = n / sum(n) * 100
   )
-```
 
-```{r}
-# teste t para gênero
-## considerar apenas um vínculo por psicólogo
+## 2.1 Preparação de Dados para Teste t (Gênero)
 vinculos_unicos <- df |> 
   filter(!is.na(genero)) |> 
   group_by(codigo_profissional_saude, genero) |> 
   summarise(
-    n_vinculos = n(),
+    n_vinculos = n(), 
     .groups = 'drop'
   )
 
+## 2.2 Testando Pressupostos para n_vinculos ~ genero
+### Normalidade
+norm_mulher_t <- vinculos_unicos |>
+  filter(genero == "Female") |> 
+  pull(n_vinculos) |> 
+  lillie.test()
+norm_homens_t <- vinculos_unicos |> 
+  filter(genero == "Male") |> 
+  pull(n_vinculos) |> 
+  lillie.test()
+
+### Homogeneidade de Variâncias
+levene_t_vinculos <- levene_test(vinculos_unicos, formula = n_vinculos ~ genero)
+
+## 2.3 Teste t com Bootstrap
+boot_t_vinculos <- boot.t.test(formula = n_vinculos ~ genero, data = vinculos_unicos, 
+                              R= 1000)
+
+descritiva_t_genero <- vinculos_unicos |>
+  group_by(genero) |>
+  get_summary_stats(n_vinculos, type = "mean_sd")
+```
+
+```{r}
+# teste t para gênero
 ## testando pressupostos
+
 ### normalidade
 norm_mulher <- vinculos_unicos |>
   filter(genero == "Female") |> 
@@ -54,8 +81,10 @@ norm_homens <- vinculos_unicos |>
   filter(genero == "Male") |> 
   pull(n_vinculos) |> 
   lillie.test()
+
 ### homogeneidade de variâncias
 levene_test(vinculos_unicos, formula = n_vinculos ~ genero)
+
 ### bootstrap
 boot_t_vinculos <- boot.t.test(formula = n_vinculos ~ genero, data = vinculos_unicos, 
                      R= 1000)
@@ -69,38 +98,51 @@ Em razão do não atendimento ao pressuposto de normalidade, procedeu ao procedi
 
 
 ```{r}
-# quantidade de psicólogos em cada região por nível de atenção
+# quantidade de psicólogos em cada região por nível de atenção (descritivas)
 df |> 
   count(regiao, nivel_atencao) |> 
   pivot_wider(names_from = nivel_atencao, values_from = n, id_cols = regiao) 
 ```
 
 ```{r}
-# tabela de contingência e teste de qui-quadrado da quantidade de vínculos em cada região por nível de atenção
+## 3.1 Tabela de Contingência
+tabela_qui_regiao <- table(df$regiao, df$nivel_atencao)
 
-ctable(x = df$regiao, y = df$nivel_atencao, chisq = T)
+## 3.2 Teste Qui-quadrado
+result_qui_regiao <- chisq.test(tabela_qui_regiao)
+
+## 3.3 Resíduos Padronizados
+residuos_qui_regiao <- result_qui_regiao$stdres
 ```
 
 ```{r}
 #variável de proporção: "nº de habitantes por profissional de psicologia"
-## agrupando por municipio para não contar municipio mais de uma vez 
+## agrupando por estado 
 
-df_prop <- df |>
+df_prop_muni <- df |>
   group_by(codigo_municipio, nome_do_municipio, regiao, estado) |> 
   summarise(
     populacao_muni = first(populacao_muni), 
-    # n() agora contará corretamente centenas ou milhares de linhas para SP
     quanti_psis_muni = n(), 
     prop_psi_muni =  populacao_muni/quanti_psis_muni,
     .groups = 'drop'
   ) |>
   ungroup()
 
-## fazer a análise por estado
+## Agrupando por estado
+df_prop_estado <- df |>
+  group_by(estado, regiao) |> 
+  summarise(
+    populacao_estado = sum(populacao_muni, na.rm = TRUE),
+    quanti_psis_estado = n(),
+    prop_psi_estado =  populacao_estado / quanti_psis_estado,
+    .groups = 'drop'
+  ) |>
+  ungroup()
 ```
 
 ```{r}
-#anova entre regiões (proporção por região)
+# Anova entre regiões (proporção por região)
 
 modelo_regiao <- aov(prop_psi_muni ~ regiao, data = df_prop)
 
@@ -173,11 +215,7 @@ e o sudeste tem menos psicólogos por população do que o sul
 Procedeu-se a uma análise de correlação no sentido de avaliar a relação entre a população do município e a proporção da quantidade de habitantes por psicólogo. Em razão do não atendimento do pressuposto de normalidade, foi realizada o teste de correlação de Spearman, cuja resultado indicou associação positiva e significativa (r(5484) = 0,33; p < 0,001), o que sugere que quanto mais pessoas residem no município, maior a demanda que os profissionais precisam atender. 
 
 ```{r}
-#correlação entre população e nº de vínculos
-
-## testando pressupostos
-### normalidade 
-#### populacao_muni
+## 5.1 Testando Pressupostos (Normalidade)
 norm_pop_muni <- df_prop |> 
   pull(populacao_muni) |> 
   lillie.test()
@@ -186,22 +224,22 @@ norm_prop_psi_muni <- df_prop |>
   pull(prop_psi_muni) |> 
   lillie.test()
 
-
-## --> que função usar pra verificar os pressupostos?
-
-cor.test(df_prop$populacao_muni, df_prop$prop_psi_muni, method = "spearman")
+## 5.2 Teste de Correlação de Spearman
+corr_spearman <- cor.test(df_prop$populacao_estado, df_prop$prop_psi_estado, method = "spearman")
 
 ```
 
 ```{r}
+#Visualização da correlação
+
 library(ggplot2)
 
-ggplot(df_prop, aes(x = populacao_muni, y = prop_psi_muni)) +
+ggplot(df_prop_estado, aes(x = populacao_estado, y = prop_psi_estado)) +
   geom_point(alpha = 0.6, color = "black") +
   geom_smooth(method = "lm", se = FALSE, color = "gray") + 
   geom_text_repel(
-    data = df_prop |> slice_max(populacao_muni, n = 5),
-    aes(label = nome_do_municipio), 
+    data = df_prop |> slice_max(populacao_estado, n = 5),
+    aes(label = estado), 
     size = 3, 
     box.padding = 0.5, 
     point.padding = 0.5,
