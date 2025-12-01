@@ -63,7 +63,7 @@ flextable(descritivos) |>
   autofit() |> 
   set_caption("Estatísticas descritivas")
 
-df <- mutate(df, ID= 1:nrow(df), .before= 1)
+df_af <- mutate(df_af, ID= 1:nrow(df_af), .before= 1)
 ```
 
 
@@ -75,10 +75,9 @@ rstatix::anova_test(prop_psi_muni ~ nivel_atencao*regiao, data = df_af, type = 3
 
 # Melhor forma
 modelo <- aov_ez(id = "ID",dv = "prop_psi_muni", 
-                 between = c("nivel_atencao", "regiao"), data = df)
+                 between = c("nivel_atencao", "regiao"), data = df_af)
 
 tabela_anova <- parameters(modelo, effectsize_type = "omega")
-
 ```
 
 ### Checando pressupostos
@@ -101,10 +100,10 @@ check_autocorrelation(modelo)
 residuos <- residuals(modelo)
 
 # Teste de normalidade dos resíduos
-normalidade_res <- shapiro_test(residuos) 
+normalidade_res <- nortest::lillie.test(residuos) 
 
 # Avaliando homogeneidade de variância
-homogeneidade <- levene_test(FS ~ Estciv*Sexo, data = df)
+homogeneidade <- levene_test(prop_psi_muni ~ nivel_atencao*regiao, data = df_af)
 
 autocorr <- car::durbinWatsonTest(modelo$lm)
 ```
@@ -123,23 +122,23 @@ Se o efeito de interação não for estatisticamente significativo, pule para a 
 #| cache: TRUE
 
 set.seed(123) # Para reprodutibilidade
-marginal_means <- bootstrap_model(modelo$lm, iterations = 1000) %>% 
-  emmeans( ~ Estciv*Sexo)
+marginal_means <- bootstrap_model(modelo$lm, iterations = 2000) |>  
+  emmeans( ~ nivel_atencao*regiao)
 
-# Efeitos condicionais para Sexo
-contr_cond_sexo <- marginal_means %>% 
-  contrast(method = "pairwise", by = "Sexo") %>% 
+# Efeitos condicionais para nivel de atenção
+contr_cond_nivel_atencao <- marginal_means |>  
+  contrast(method = "pairwise", by = "nivel_atencao") |>  
   parameters(bootstrap = TRUE, ci_method = "bci")
 
-# Efeitos condicionais para Estado civil
-contr_cond_estciv <- marginal_means %>% 
-  contrast(method = "pairwise", by = "Estciv") %>% 
+# Efeitos condicionais para região
+contr_cond_regiao <- marginal_means |>  
+  contrast(method = "pairwise", by = "regiao") |> 
   parameters(bootstrap = TRUE, ci_method = "bci")
 
 
 # Contraste geral: Todas as combinações de grupos
-contr_geral <-marginal_means %>% 
-  contrast( method = "pairwise",  adjust = "holm") %>% 
+contr_geral <-marginal_means |>  
+  contrast( method = "pairwise",  adjust = "holm") |>  
   parameters(bootstrap = TRUE, ci_method = "bci")
 
 
@@ -153,9 +152,11 @@ contr_geral <-marginal_means %>%
 
 # Tamanho de efeito condicional sexo
 set.seed(123) # Para reprodutibilidade
-d_cond_sexo <- df %>% 
-  group_by(Sexo) %>% 
-  cohens_d(FS ~ Estciv, var.equal = F, ci = T, ci.type = "bca", nboot = 1000)
+d_cond_nivel_atencao <- df_af |>  
+  group_by(nivel_atencao) 
+
+
+d <- cohens_d(data = df_af, prop_psi_muni ~ nivel_atencao, var.equal = F, ci = T, ci.type = "bca", nboot = 2000)
 
 # Tamanho de efeito condicional Estciv
 set.seed(123) # Para reprodutibilidade
