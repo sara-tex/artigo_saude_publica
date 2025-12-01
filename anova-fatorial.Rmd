@@ -1,5 +1,0 @@
----
-title: "anova-fatorial"
-output: html_document
----
-

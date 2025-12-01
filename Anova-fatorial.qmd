@@ -69,10 +69,6 @@ df_af <- mutate(df_af, ID= 1:nrow(df_af), .before= 1)
 
 # Modelo de anova fatorail
 ```{r}
-
-# Forma rápida
-rstatix::anova_test(prop_psi_muni ~ nivel_atencao*regiao, data = df_af, type = 3)
-
 # Melhor forma
 modelo <- aov_ez(id = "ID",dv = "prop_psi_muni", 
                  between = c("nivel_atencao", "regiao"), data = df_af)
@@ -87,11 +83,11 @@ tabela_anova <- parameters(modelo, effectsize_type = "omega")
 #| eval: FALSE
 
 # Este chunk não será exibido no relatório
-check_normality(modelo) %>% 
+check_normality(modelo) |>  
   plot()
 
-check_homogeneity(modelo) %>% plot()
-check_heteroscedasticity(modelo) %>% plot()
+check_homogeneity(modelo) |>  plot()
+check_heteroscedasticity(modelo) |> plot()
 check_autocorrelation(modelo)
 ```
 
@@ -140,9 +136,6 @@ contr_cond_regiao <- marginal_means |>
 contr_geral <-marginal_means |>  
   contrast( method = "pairwise",  adjust = "holm") |>  
   parameters(bootstrap = TRUE, ci_method = "bci")
-
-
-
 ```
 
 #### Tamanho de efeito das diferenças entre os grupos
@@ -153,39 +146,21 @@ contr_geral <-marginal_means |>
 # Tamanho de efeito condicional sexo
 set.seed(123) # Para reprodutibilidade
 d_cond_nivel_atencao <- df_af |>  
-  group_by(nivel_atencao) 
-
-
-d <- cohens_d(data = df_af, prop_psi_muni ~ nivel_atencao, var.equal = F, ci = T, ci.type = "bca", nboot = 2000)
+  group_by(regiao) |> 
+  cohens_d(prop_psi_muni ~ nivel_atencao, var.equal = F, ci = T, ci.type = "perc", nboot = 2000)
 
 # Tamanho de efeito condicional Estciv
 set.seed(123) # Para reprodutibilidade
-d_cond_Estciv <- df %>% 
-  group_by(Estciv) %>% 
-  cohens_d(FS ~ Sexo, var.equal = F, ci = T, ci.type = "bca", nboot = 1000)
+d_cond_regiao <- df_af |> 
+  group_by(nivel_atencao) |>  
+  cohens_d(prop_psi_muni ~ regiao, var.equal = F, ci = T, ci.type = "perc", nboot = 2000)
 
 
 # Tamanho de efeito geral (todas as comparações)
 set.seed(123) # Para reprodutibilidade
-d_geral <-df %>% 
-  mutate(EstCiv_Sex = paste(Estciv, Sexo, sep = "_")) %>% 
-  cohens_d(FS ~ EstCiv_Sex, var.equal = F, ci = T, ci.type = "bca", nboot = 1000)
-
-```
-
-### Efeitos principais
-
-```{r}
-
-# Efeito principal Estciv
-contr_Estciv <- bootstrap_model(modelo$lm, iterations = 1000) %>% 
-  emmeans( ~ Estciv) %>% 
-  contrast("pairwise") %>% 
-  parameters(bootstrap = TRUE, ci_method = "bci")
-
-
-set.seed(123) # Para reprodutibilidade
-d_Estciv <- cohens_d(FS ~ Estciv, data = df, var.equal = F, ci = T, ci.type = "bca", nboot = 1000)
+d_geral <- df_af |>  
+  mutate(nivel_atencao_regiao = paste(nivel_atencao, regiao, sep = "_")) |> 
+  cohens_d(prop_psi_muni ~ nivel_atencao_regiao, var.equal = F, ci = T, ci.type = "perc", nboot = 2000)
 
 ```
 
