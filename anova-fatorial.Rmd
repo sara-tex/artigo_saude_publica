@@ -1,0 +1,264 @@
+---
+title: "Anova-fatorial"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+# Preparação
+
+Carregando os pacotes necessários e funções para formatar tabelas e gráficos.
+
+```{r setup, include=FALSE}
+# Instale e carregue os pacotes necessários
+pacman::p_load(haven, tidyverse, easystats, afex, emmeans, rstatix, flextable, ggbeeswarm, qqplotr, ggpubr)
+
+# Para estabelecer o padrão do documento
+knitr::opts_chunk$set(echo = FALSE)
+
+# 
+options(parallel = "snow")
+# Para formatar tabelas
+options(digits = 3)
+set_flextable_defaults(decimal.mark = ",", big.mark = " ")
+
+# Estabelecer tema para gráficos
+theme_set(theme_minimal())
+
+```
+
+Carregando os dados
+
+```{r}
+df <- read_csv("dados-limpo.csv") |> 
+  as_factor() |> 
+  filter(nivel_atencao %in% c("atenção primária", "atenção secundária", "atenção terciária"))
+```
+
+## Limpeza de banco de dados
+```{r}
+df_af <- df |> 
+  group_by(codigo_municipio, nome_do_municipio, regiao, estado, nivel_atencao) |> 
+  summarise(
+    populacao_muni = first(populacao_muni), 
+    # n() agora contará corretamente centenas ou milhares de linhas para SP
+    quanti_psis_muni = n(), 
+    prop_psi_muni =  populacao_muni/quanti_psis_muni,
+    .groups = 'drop'
+  ) |>
+  ungroup()
+```
+
+```{r}
+df_af <- df_af |> 
+  select(prop_psi_muni, nivel_atencao, regiao)
+```
+
+## Estatísticas descritivas
+
+```{r}
+descritivos <- df_af |> 
+  group_by(regiao, nivel_atencao) |> 
+  get_summary_stats(type = "common")
+
+flextable(descritivos) |> 
+  autofit() |> 
+  set_caption("Estatísticas descritivas")
+
+df_af <- mutate(df_af, ID= 1:nrow(df_af), .before= 1)
+```
+
+
+# Modelo de anova fatorail
+```{r}
+
+# Forma rápida
+rstatix::anova_test(prop_psi_muni ~ nivel_atencao*regiao, data = df_af, type = 3)
+
+# Melhor forma
+modelo <- aov_ez(id = "ID",dv = "prop_psi_muni", 
+                 between = c("nivel_atencao", "regiao"), data = df_af)
+
+tabela_anova <- parameters(modelo, effectsize_type = "omega")
+```
+
+### Checando pressupostos
+
+```{r}
+#| include: FALSE
+#| eval: FALSE
+
+# Este chunk não será exibido no relatório
+check_normality(modelo) %>% 
+  plot()
+
+check_homogeneity(modelo) %>% plot()
+check_heteroscedasticity(modelo) %>% plot()
+check_autocorrelation(modelo)
+```
+
+```{r}
+
+residuos <- residuals(modelo)
+
+# Teste de normalidade dos resíduos
+normalidade_res <- nortest::lillie.test(residuos) 
+
+# Avaliando homogeneidade de variância
+homogeneidade <- levene_test(prop_psi_muni ~ nivel_atencao*regiao, data = df_af)
+
+autocorr <- car::durbinWatsonTest(modelo$lm)
+```
+
+Os pressupostos não foram acatados, indicando que é necessário usar métodos robustos para a avaliação da diferença entre os grupos.
+
+## Contrastes das médias marginais com bootstrapping
+
+### Efeitos de interação
+
+Se o efeito de interação for significativo, comece por ele. Quando há interação, a interpretação dos efeitos principais pode ser contraintuitiva.
+
+Se o efeito de interação não for estatisticamente significativo, pule para a investigação dos efeitos principais.
+
+```{r}
+#| cache: TRUE
+
+set.seed(123) # Para reprodutibilidade
+marginal_means <- bootstrap_model(modelo$lm, iterations = 2000) |>  
+  emmeans( ~ nivel_atencao*regiao)
+
+# Efeitos condicionais para nivel de atenção
+contr_cond_nivel_atencao <- marginal_means |>  
+  contrast(method = "pairwise", by = "nivel_atencao") |>  
+  parameters(bootstrap = TRUE, ci_method = "bci")
+
+# Efeitos condicionais para região
+contr_cond_regiao <- marginal_means |>  
+  contrast(method = "pairwise", by = "regiao") |> 
+  parameters(bootstrap = TRUE, ci_method = "bci")
+
+
+# Contraste geral: Todas as combinações de grupos
+contr_geral <-marginal_means |>  
+  contrast( method = "pairwise",  adjust = "holm") |>  
+  parameters(bootstrap = TRUE, ci_method = "bci")
+
+
+
+```
+
+#### Tamanho de efeito das diferenças entre os grupos
+
+```{r}
+#| cache: TRUE
+
+# Tamanho de efeito condicional sexo
+set.seed(123) # Para reprodutibilidade
+d_cond_nivel_atencao <- df_af |>
+  group_by(regiao) |> 
+  cohens_d(prop_psi_muni ~ nivel_atencao, var.equal = F, ci = T, ci.type = "perc", nboot = 2000)
+
+# Tamanho de efeito condicional Estciv
+set.seed(123) # Para reprodutibilidade
+d_cond_Estciv <- df_af |> 
+  group_by(nivel_atencao) |>  
+  cohens_d(prop_psi_muni ~ regiao, var.equal = F, ci = T, ci.type = "perc", nboot = 2000)
+
+
+# Tamanho de efeito geral (todas as comparações)
+set.seed(123) # Para reprodutibilidade
+d_geral <- df_af |>  
+  mutate(nivel_atencao_regiao = paste(nivel_atencao, regiao, sep = "_")) |>  
+  cohens_d(prop_psi_muni ~ nivel_atencao_regiao, var.equal = F, ci = T, ci.type = "perc", nboot = 2000)
+
+```
+
+### Efeitos principais
+
+```{r}
+
+# Efeito principal Estciv
+contr_Estciv <- bootstrap_model(modelo$lm, iterations = 1000) %>% 
+  emmeans( ~ Estciv) %>% 
+  contrast("pairwise") %>% 
+  parameters(bootstrap = TRUE, ci_method = "bci")
+
+
+set.seed(123) # Para reprodutibilidade
+d_Estciv <- cohens_d(FS ~ Estciv, data = df, var.equal = F, ci = T, ci.type = "bca", nboot = 1000)
+
+```
+
+# Reporte
+
+## Procedimentos de análise
+
+Foi realizada uma anova fatorial (3x2) com o objetivo de verificar em que medida os níveis de felicidade subjetiva eram diferentes entre homens e mulheres com diferentes estados civil (solteiros, namorando/noivos, casados). A normalidade dos dados foi avaliada por meio do teste Shapiro-Wilk. O pressuposto de homogeneidade de variância foi avaliado por meio do teste de Levene. Foram realizadas análises dos contrastes para os efeitos principais e de interação (sexo\*estado civil), a partir das médias marginais estimadas. Procedimentos de bootstrapping (1000 re-amostragens; 95% IC BCa) foram implementados para se obter uma maior confiabilidade dos resultados, para corrigir desvios de normalidade da distribuição da amostra e diferenças entre os tamanhos dos grupos e, também, para apresentar um intervalo de confiança de 95% para as diferenças entre as médias (Haukoos & Lewis, 2005). A análise foi realizada no software R (R Core Team, 2023).
+
+## Resultados
+
+```{r}
+tabela_anova %>% 
+  select(-Sum_Squares, -Mean_Square, -Method) %>% 
+  flextable() %>% 
+  colformat_double(digits = 3) %>%
+  autofit() %>%
+  set_caption("Resultados da ANOVA Fatorial")
+```
+
+Os resultados da ANOVA demonstraram que houve um efeito estatisticamente significativo para estado civil (*F*(2, 376) = 15,863, *p* \< 0,001, *partial* ω² = 0,072), para sexo (*F*(1, 376) = 51,588, *p* \< 0,001, *partial* ω² = 0,117), bem como para a interação entre estas duas variáveis (*F*(2, 376) = 24,438, *p* \< 0,001, *partial* ω² = 0,109).
+
+Em relação à interação (sexo\*estado civil), mulheres apresentaram escores significativamente maiores que os homens em todas as comparações, exceto para o grupo de casados (i.e., mulheres solteiras eram mais felizes que homens solteiros; mulheres namorando/noivas eram mais felizes que homens namorando/noivos e mulheres casadas obtiveram os mesmos níveis de felicidade do que homens casados).
+
+Os resultados também demonstraram que os níveis de felicidade das mulheres independiam do seu estado civil. Já para homens, todas as comparações foram estatisticamente significativas, de modo que homens casados eram mais felizes que homens namorando/noivos e homens solteiros, e homens namorando/noivos eram mais felizes que homens solteiros (Ver Tabela 3).
+
+```{r}
+contr_cond_estciv %>%
+  select(-Median.1, -CI, -pd) %>% 
+  rename_with( ~ c("Comparação", "Diferença nas médias", "IC 95% Bca \n Limite Inferior", "IC 95% Bca \n Limite Superior")) %>% 
+  flextable() %>% 
+  autofit() %>%
+  set_caption("Teste de comparações múltiplas por nível de Estado Civil")
+```
+
+```{r}
+contr_cond_sexo %>%
+  select(-Median.1, -CI, -pd) %>% 
+  rename_with( ~ c("Comparação", "Diferença nas médias", "IC 95% Bca \n Limite Inferior", "IC 95% Bca \n Limite Superior")) %>% 
+  flextable() %>% 
+  autofit() %>%
+  set_caption("Teste de comparações múltiplas por Sexo")
+```
+
+## Visualização dos resultados
+
+```{r}
+#| fig.width: 8 
+#| fig.height: 6
+
+
+afex_plot(modelo, x = "Estciv", trace = "Sexo", 
+          mapping = c("shape", "color"),
+          data_plot = F,
+          # data_alpha = 0.25, data_geom = geom_violin,
+          point_arg = list(size= 3),
+          line_arg = list(linewidth = 1),
+          ) +
+  ggpubr::color_palette(palette = "jco") +
+  labs(x= "Estado Civil", y= "Felicidade Subjetiva") 
+  # 
+```
+
+```{r}
+#| fig.width: 8 
+#| fig.height: 6
+
+plot(contr_cond_sexo) +
+  labs(x= "Diferença de médias", y= "Comparações")
+```
+
+# Referências
+
+Haukoos, J. S., & Lewis, R. J. (2005). Advanced statistics: Bootstrapping confidence intervals for statistics with “difficult” distributions. Academic Emergency Medicine, 12(4), 360-365. <doi:10.1197/j.aem.2004.11.018>
+
+R Core Team (2023). *R: A Language and Environment for Statistical Computing*. R Foundation for Statistical Computing, Vienna, Austria. <https://www.R-project.org/>

@@ -9,7 +9,8 @@ editor_options:
 
 Carregando os pacotes necessários e funções para formatar tabelas e gráficos.
 
-```{r setup, include=FALSE}
+```{r setup}
+#| include: FALSE
 # Instale e carregue os pacotes necessários
 pacman::p_load(haven, tidyverse, easystats, afex, emmeans, rstatix, flextable, ggbeeswarm, qqplotr, ggpubr)
 
@@ -22,7 +23,6 @@ set_flextable_defaults(decimal.mark = ",", big.mark = " ")
 
 # Estabelecer tema para gráficos
 theme_set(theme_minimal())
-
 ```
 
 Carregando os dados
@@ -39,7 +39,6 @@ df_af <- df |>
   group_by(codigo_municipio, nome_do_municipio, regiao, estado, nivel_atencao) |> 
   summarise(
     populacao_muni = first(populacao_muni), 
-    # n() agora contará corretamente centenas ou milhares de linhas para SP
     quanti_psis_muni = n(), 
     prop_psi_muni =  populacao_muni/quanti_psis_muni,
     .groups = 'drop'
@@ -104,15 +103,11 @@ homogeneidade <- levene_test(prop_psi_muni ~ nivel_atencao*regiao, data = df_af)
 autocorr <- car::durbinWatsonTest(modelo$lm)
 ```
 
-Os pressupostos não foram acatados, indicando que é necessário usar métodos robustos para a avaliação da diferença entre os grupos.
+Os pressupostos de normalidade dos resíduos e de homogeneidade de variâncias não foram acatados, por isso é necessário usar métodos robustos para a avaliação da diferença entre os grupos.
 
 ## Contrastes das médias marginais com bootstrapping
 
 ### Efeitos de interação
-
-Se o efeito de interação for significativo, comece por ele. Quando há interação, a interpretação dos efeitos principais pode ser contraintuitiva.
-
-Se o efeito de interação não for estatisticamente significativo, pule para a investigação dos efeitos principais.
 
 ```{r}
 #| cache: TRUE
@@ -168,69 +163,34 @@ d_geral <- df_af |>
 
 ## Procedimentos de análise
 
-Foi realizada uma anova fatorial (3x2) com o objetivo de verificar em que medida os níveis de felicidade subjetiva eram diferentes entre homens e mulheres com diferentes estados civil (solteiros, namorando/noivos, casados). A normalidade dos dados foi avaliada por meio do teste Shapiro-Wilk. O pressuposto de homogeneidade de variância foi avaliado por meio do teste de Levene. Foram realizadas análises dos contrastes para os efeitos principais e de interação (sexo\*estado civil), a partir das médias marginais estimadas. Procedimentos de bootstrapping (1000 re-amostragens; 95% IC BCa) foram implementados para se obter uma maior confiabilidade dos resultados, para corrigir desvios de normalidade da distribuição da amostra e diferenças entre os tamanhos dos grupos e, também, para apresentar um intervalo de confiança de 95% para as diferenças entre as médias (Haukoos & Lewis, 2005). A análise foi realizada no software R (R Core Team, 2023).
+Foi realizada uma anova fatorial (3x5) com o objetivo de verificar em que medida a proporção de habitantes por psicólogos era diferente entre níveis assistenciais (primário, secundário e terciário) a dependder das regiões (Centro-Oeste, Norte, Nordeste, Sudeste e Sul). A normalidade dos dados foi avaliada por meio do teste de Kolmogorov-Smirnovk com correção de Lilliefors. A homogeneidade de variância foi mensurada por meio do teste de Levene. Foram realizadas análises dos contrastes para os efeitos principais e de interação (nível assistencial\*região), a partir das médias marginais estimadas. Procedimentos de bootstrapping (2000 re-amostragens; 95% IC BCa) foram implementados para se obter uma maior confiabilidade dos resultados, para corrigir desvios de normalidade da distribuição da amostra e diferenças entre os tamanhos dos grupos e, também, para apresentar um intervalo de confiança de 95% para as diferenças entre as médias (Haukoos & Lewis, 2005). A análise foi realizada no software R (R Core Team, 2023).
 
 ## Resultados
 
 ```{r}
-tabela_anova %>% 
-  select(-Sum_Squares, -Mean_Square, -Method) %>% 
-  flextable() %>% 
-  colformat_double(digits = 3) %>%
-  autofit() %>%
+tabela_anova |>  
+  select(-Sum_Squares, -Mean_Square, -Method) |>  
+  flextable() |> 
+  colformat_double(digits = 3) |> 
+  autofit() |> 
   set_caption("Resultados da ANOVA Fatorial")
 ```
 
-Os resultados da ANOVA demonstraram que houve um efeito estatisticamente significativo para estado civil (*F*(2, 376) = 15,863, *p* \< 0,001, *partial* ω² = 0,072), para sexo (*F*(1, 376) = 51,588, *p* \< 0,001, *partial* ω² = 0,117), bem como para a interação entre estas duas variáveis (*F*(2, 376) = 24,438, *p* \< 0,001, *partial* ω² = 0,109).
+Os testes de Kolmogorov-Smirnov com correção de Lilliefors (*D* = 0,2, *p* \< 0,001) e o teste de Levene (*F*(14, 9966)= 81, *p* \< 0,001) indicaram, respectivamente, a ausência de normalidade dos resíduos e de homogeneidade de variâncias.
 
-Em relação à interação (sexo\*estado civil), mulheres apresentaram escores significativamente maiores que os homens em todas as comparações, exceto para o grupo de casados (i.e., mulheres solteiras eram mais felizes que homens solteiros; mulheres namorando/noivas eram mais felizes que homens namorando/noivos e mulheres casadas obtiveram os mesmos níveis de felicidade do que homens casados).
+Os resultados da ANOVA demonstraram que houve um efeito estatisticamente significativo para nível de atenção (*F*(2, 9966) = 594,7, *p* \< 0,001, *partial* ω² = XXXX), para sexo (*F*(4, 9966) = 29,640, *p* \< 0,001, *partial* ω² = XXXX), bem como para a interação entre estas duas variáveis (*F*(8, 9966 ) = 15,167, *p* \< 0,001, *partial* ω² = XXXX).
 
-Os resultados também demonstraram que os níveis de felicidade das mulheres independiam do seu estado civil. Já para homens, todas as comparações foram estatisticamente significativas, de modo que homens casados eram mais felizes que homens namorando/noivos e homens solteiros, e homens namorando/noivos eram mais felizes que homens solteiros (Ver Tabela 3).
+Em relação à interação (Nível de atenção\*Região), apenas a o par atenção primária e atenção secundária  da região Centro-Oeste não apresentou diferença significativa [IC 95% Bca -743.38,   1424.86]. A atenção terciária teve uma proporção significativamente maior que a primária [IC 95% Bca -17335.52, -10074.99] e a secundária [IC 95% Bca -17668,37, -10404,40]. Nas outras regiões, observou-se que o padrão de distribuição dos psicólogos em todos os níveis asistenciais foi dependente da respectiva região. 
 
-```{r}
-contr_cond_estciv %>%
-  select(-Median.1, -CI, -pd) %>% 
-  rename_with( ~ c("Comparação", "Diferença nas médias", "IC 95% Bca \n Limite Inferior", "IC 95% Bca \n Limite Superior")) %>% 
-  flextable() %>% 
-  autofit() %>%
-  set_caption("Teste de comparações múltiplas por nível de Estado Civil")
-```
+Na região Nordeste, 
 
-```{r}
-contr_cond_sexo %>%
-  select(-Median.1, -CI, -pd) %>% 
-  rename_with( ~ c("Comparação", "Diferença nas médias", "IC 95% Bca \n Limite Inferior", "IC 95% Bca \n Limite Superior")) %>% 
-  flextable() %>% 
-  autofit() %>%
-  set_caption("Teste de comparações múltiplas por Sexo")
-```
+No Norte,
 
-## Visualização dos resultados
+Na região Sudeste,
 
-```{r}
-#| fig.width: 8 
-#| fig.height: 6
+No Sul, 
 
 
-afex_plot(modelo, x = "Estciv", trace = "Sexo", 
-          mapping = c("shape", "color"),
-          data_plot = F,
-          # data_alpha = 0.25, data_geom = geom_violin,
-          point_arg = list(size= 3),
-          line_arg = list(linewidth = 1),
-          ) +
-  ggpubr::color_palette(palette = "jco") +
-  labs(x= "Estado Civil", y= "Felicidade Subjetiva") 
-  # 
-```
-
-```{r}
-#| fig.width: 8 
-#| fig.height: 6
-
-plot(contr_cond_sexo) +
-  labs(x= "Diferença de médias", y= "Comparações")
-```
 
 # Referências
 
