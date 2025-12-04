@@ -113,7 +113,7 @@ result_qui_regiao <- chisq.test(tabela_qui_regiao)
 
 ## 3.3 Resíduos Padronizados
 residuos_qui_regiao <- result_qui_regiao$stdres
-```
+idu```
 
 ```{r}
 #variável de proporção: "nº de habitantes por profissional de psicologia"
@@ -216,17 +216,16 @@ Procedeu-se a uma análise de correlação no sentido de avaliar a relação ent
 
 ```{r}
 ## 5.1 Testando Pressupostos (Normalidade)
-norm_pop_muni <- df_prop |> 
-  pull(populacao_muni) |> 
+norm_pop_muni <- df_prop_estado |> 
+  pull(populacao_estado) |> 
   lillie.test()
 
-norm_prop_psi_muni <- df_prop |> 
-  pull(prop_psi_muni) |> 
+norm_prop_psi_muni <- df_prop_estado |> 
+  pull(prop_psi_estado) |> 
   lillie.test()
 
 ## 5.2 Teste de Correlação de Spearman
-corr_spearman <- cor.test(df_prop$populacao_estado, df_prop$prop_psi_estado, method = "spearman")
-
+corr_spearman <- cor.test(df_prop_estado$populacao_estado, df_prop_estado$prop_psi_estado, method = "spearman")
 ```
 
 ```{r}
@@ -238,7 +237,7 @@ ggplot(df_prop_estado, aes(x = populacao_estado, y = prop_psi_estado)) +
   geom_point(alpha = 0.6, color = "black") +
   geom_smooth(method = "lm", se = FALSE, color = "gray") + 
   geom_text_repel(
-    data = df_prop |> slice_max(populacao_estado, n = 5),
+    data = df_prop_estado |> slice_max(populacao_estado, n = 5),
     aes(label = estado), 
     size = 3, 
     box.padding = 0.5, 
@@ -247,7 +246,7 @@ ggplot(df_prop_estado, aes(x = populacao_estado, y = prop_psi_estado)) +
     max.overlaps = Inf) +labs(
     title = "Correlação entre População e Psicólogos",
     x = "População do Município",
-    y = "Proporção de Psicólogos"
+    y = "Cobertura de Psicólogos"
   ) +
   theme_minimal()
 ```
