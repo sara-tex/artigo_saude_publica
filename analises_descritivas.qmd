@@ -8,6 +8,7 @@ editor_options:
 ```{r}
 library(tidyverse)
 library(janitor)
+library(flextable)
 ```
 
 ```{r}
@@ -60,11 +61,14 @@ df |>
 # quantidade de vínculos de psicólogos por nível assistencial em cada região
 df |> 
   count(nivel_atencao, regiao) |> 
-  group_by(regiao) |> 
+  group_by(nivel_atencao) |> 
   mutate(
     prop = n / sum(n) * 100
   ) |> 
-  ungroup() 
+  ungroup() |> 
+  flextable() |> 
+  colformat_double(digits = 3) |> 
+  autofit()
 ```
 
 ```{r}

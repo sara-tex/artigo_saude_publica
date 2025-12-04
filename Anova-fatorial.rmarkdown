@@ -178,7 +178,7 @@ tabela_anova |>
 
 Os testes de Kolmogorov-Smirnov com correção de Lilliefors (*D* = 0,2, *p* \< 0,001) e o teste de Levene (*F*(14, 9966)= 81, *p* \< 0,001) indicaram, respectivamente, a ausência de normalidade dos resíduos e de homogeneidade de variâncias.
 
-Os resultados da ANOVA demonstraram que houve um efeito estatisticamente significativo para nível de atenção (*F*(2, 9966) = 594,7, *p* \< 0,001, *partial* ω² = XXXX), para região (*F*(4, 9966) = 29,640, *p* \< 0,001, *partial* ω² = XXXX), bem como para a interação entre estas duas variáveis (*F*(8, 9966 ) = 15,167, *p* \< 0,001, *partial* ω² = XXXX).
+Os resultados da ANOVA demonstraram que houve um efeito estatisticamente significativo para nível de atenção (*F*(2, 9966) = 594,7, *p* \< 0,001, *partial* ω² = XXXX), para sexo (*F*(4, 9966) = 29,640, *p* \< 0,001, *partial* ω² = XXXX), bem como para a interação entre estas duas variáveis (*F*(8, 9966 ) = 15,167, *p* \< 0,001, *partial* ω² = XXXX).
 
 Em relação à interação (Nível de atenção\*Região), apenas a o par atenção primária e atenção secundária  da região Centro-Oeste não apresentou diferença significativa [IC 95% Bca -743.38,   1424.86]. A atenção terciária teve uma proporção significativamente maior que a primária [IC 95% Bca -17335.52, -10074.99] e a secundária [IC 95% Bca -17668,37, -10404,40]. Nas outras regiões, observou-se que o padrão de distribuição dos psicólogos em todos os níveis asistenciais foi dependente da respectiva região. 
 
@@ -197,3 +197,4 @@ No Sul,
 Haukoos, J. S., & Lewis, R. J. (2005). Advanced statistics: Bootstrapping confidence intervals for statistics with “difficult” distributions. Academic Emergency Medicine, 12(4), 360-365. <doi:10.1197/j.aem.2004.11.018>
 
 R Core Team (2023). *R: A Language and Environment for Statistical Computing*. R Foundation for Statistical Computing, Vienna, Austria. <https://www.R-project.org/>
+
