@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Anova-fatorial</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="Anova-fatorial_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Anova-fatorial_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Anova-fatorial_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Anova-fatorial_files/libs/quarto-html/popper.min.js"></script>
+<script src="Anova-fatorial_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Anova-fatorial_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Anova-fatorial_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Anova-fatorial_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Anova-fatorial_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Anova-fatorial_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Anova-fatorial_files/libs/bootstrap/bootstrap-bb462d781dde1847d9e3ccf7736099dd.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="Anova-fatorial_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+
+<script src="Anova-fatorial_files/libs/tabwid-1.1.3/tabwid.js"></script>
+
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Anova-fatorial</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="preparação" class="level1">
+<h1>Preparação</h1>
+<p>Carregando os pacotes necessários e funções para formatar tabelas e gráficos.</p>
+<p>Carregando os dados</p>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Anexando pacote: 'janitor'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>O seguinte objeto é mascarado por 'package:rstatix':
+
+    make_clean_names</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>O seguinte objeto é mascarado por 'package:insight':
+
+    clean_names</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Os seguintes objetos são mascarados por 'package:datawizard':
+
+    remove_empty, remove_empty_rows</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Os seguintes objetos são mascarados por 'package:stats':
+
+    chisq.test, fisher.test</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>New names:
+Rows: 75779 Columns: 18
+── Column specification
+──────────────────────────────────────────────────────── Delimiter: "," chr
+(10): nome, genero, codigo_profissional_saude, estabelecimento, nivel_at... dbl
+(8): ...1, cartao_saude, cbo, codigo_tipo_estabelecimento, codigo_estab...
+ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+Specify the column types or set `show_col_types = FALSE` to quiet this message.
+• `` -&gt; `...1`</code></pre>
+</div>
+</div>
+<section id="limpeza-de-banco-de-dados" class="level2">
+<h2 class="anchored" data-anchor-id="limpeza-de-banco-de-dados">Limpeza de banco de dados</h2>
+</section>
+<section id="estatísticas-descritivas" class="level2">
+<h2 class="anchored" data-anchor-id="estatísticas-descritivas">Estatísticas descritivas</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-e1c3ec1c{}.cl-e1b5652a{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-e1b9f306{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e1b9f31a{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-e1ba1c8c{width:1.619in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1c96{width:1.168in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1ca0{width:1.287in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1ca1{width:0.668in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1caa{width:0.795in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cab{width:0.837in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cb4{width:0.786in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cbe{width:0.752in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cbf{width:1.619in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cc8{width:1.168in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cd2{width:1.287in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cd3{width:0.668in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cdc{width:0.795in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cdd{width:0.837in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1ce6{width:0.786in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1ce7{width:0.752in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cf0{width:1.619in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cfa{width:1.168in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1cfb{width:1.287in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d04{width:0.668in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d05{width:0.795in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d0e{width:0.837in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d18{width:0.786in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d19{width:0.752in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d22{width:1.619in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d23{width:1.168in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d2c{width:1.287in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d2d{width:0.668in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d36{width:0.795in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d37{width:0.837in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d40{width:0.786in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1ba1d4a{width:0.752in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-e1c3ec1c"><thead><tr style="overflow-wrap:break-word;"><th class="cl-e1ba1c8c"><p class="cl-e1b9f306"><span class="cl-e1b5652a">nivel_atencao</span></p></th><th class="cl-e1ba1c96"><p class="cl-e1b9f306"><span class="cl-e1b5652a">regiao</span></p></th><th class="cl-e1ba1ca0"><p class="cl-e1b9f306"><span class="cl-e1b5652a">variable</span></p></th><th class="cl-e1ba1ca1"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">n</span></p></th><th class="cl-e1ba1caa"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">min</span></p></th><th class="cl-e1ba1cab"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">max</span></p></th><th class="cl-e1ba1cb4"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">median</span></p></th><th class="cl-e1ba1cbe"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">iqr</span></p></th><th class="cl-e1ba1cbe"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">mean</span></p></th><th class="cl-e1ba1cbe"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">sd</span></p></th><th class="cl-e1ba1ca1"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">se</span></p></th><th class="cl-e1ba1ca1"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">ci</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cbf"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção primária</span></p></td><td class="cl-e1ba1cc8"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Centro-oeste</span></p></td><td class="cl-e1ba1cd2"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">413</span></p></td><td class="cl-e1ba1cdc"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">707,2</span></p></td><td class="cl-e1ba1cdd"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">62 333</span></p></td><td class="cl-e1ba1ce6"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">4 326</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">5 639</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">7 136</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">8 168</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">402</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">790</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cf0"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção secundária</span></p></td><td class="cl-e1ba1cfa"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Centro-oeste</span></p></td><td class="cl-e1ba1cfb"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">252</span></p></td><td class="cl-e1ba1d05"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">744,0</span></p></td><td class="cl-e1ba1d0e"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">33 890</span></p></td><td class="cl-e1ba1d18"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">5 330</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">4 625</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">6 841</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">5 588</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">352</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">693</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cf0"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção terciária</span></p></td><td class="cl-e1ba1cfa"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Centro-oeste</span></p></td><td class="cl-e1ba1cfb"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">123</span></p></td><td class="cl-e1ba1d05"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">995,5</span></p></td><td class="cl-e1ba1d0e"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">112 304</span></p></td><td class="cl-e1ba1d18"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">13 471</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">19 343</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">20 604</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">19 288</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 739</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">3 443</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cbf"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção primária</span></p></td><td class="cl-e1ba1cc8"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Nordeste</span></p></td><td class="cl-e1ba1cd2"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 706</span></p></td><td class="cl-e1ba1cdc"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">646,0</span></p></td><td class="cl-e1ba1cdd"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">121 067</span></p></td><td class="cl-e1ba1ce6"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">6 174</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">7 095</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">8 897</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">9 161</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">222</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">435</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cf0"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção secundária</span></p></td><td class="cl-e1ba1cfa"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Nordeste</span></p></td><td class="cl-e1ba1cfb"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 100</span></p></td><td class="cl-e1ba1d05"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 070,8</span></p></td><td class="cl-e1ba1d0e"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">53 642</span></p></td><td class="cl-e1ba1d18"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">7 217</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">8 708</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">9 854</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">7 575</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">228</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">448</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cf0"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção terciária</span></p></td><td class="cl-e1ba1cfa"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Nordeste</span></p></td><td class="cl-e1ba1cfb"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">372</span></p></td><td class="cl-e1ba1d05"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">790,6</span></p></td><td class="cl-e1ba1d0e"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">204 081</span></p></td><td class="cl-e1ba1d18"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">15 797</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">21 873</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">24 390</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">24 301</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 260</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">2 478</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cbf"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção primária</span></p></td><td class="cl-e1ba1cc8"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Norte</span></p></td><td class="cl-e1ba1cd2"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">405</span></p></td><td class="cl-e1ba1cdc"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">913,5</span></p></td><td class="cl-e1ba1cdd"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">145 488</span></p></td><td class="cl-e1ba1ce6"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">7 728</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">10 305</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">12 587</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">15 709</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">781</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 535</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cf0"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção secundária</span></p></td><td class="cl-e1ba1cfa"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Norte</span></p></td><td class="cl-e1ba1cfb"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">223</span></p></td><td class="cl-e1ba1d05"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">2 464,0</span></p></td><td class="cl-e1ba1d0e"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">58 018</span></p></td><td class="cl-e1ba1d18"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">12 662</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">12 291</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">15 669</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">10 194</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">683</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 345</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cf0"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção terciária</span></p></td><td class="cl-e1ba1cfa"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Norte</span></p></td><td class="cl-e1ba1cfb"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">133</span></p></td><td class="cl-e1ba1d05"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">2 744,0</span></p></td><td class="cl-e1ba1d0e"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">254 614</span></p></td><td class="cl-e1ba1d18"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">15 690</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">21 807</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">23 074</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">27 475</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">2 382</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">4 713</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cbf"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção primária</span></p></td><td class="cl-e1ba1cc8"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Sudeste</span></p></td><td class="cl-e1ba1cd2"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 569</span></p></td><td class="cl-e1ba1cdc"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">357,0</span></p></td><td class="cl-e1ba1cdd"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">189 456</span></p></td><td class="cl-e1ba1ce6"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">3 772</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">5 099</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">7 178</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">12 940</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">327</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">641</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cf0"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção secundária</span></p></td><td class="cl-e1ba1cfa"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Sudeste</span></p></td><td class="cl-e1ba1cfb"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">967</span></p></td><td class="cl-e1ba1d05"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">707,4</span></p></td><td class="cl-e1ba1d0e"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">47 759</span></p></td><td class="cl-e1ba1d18"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">4 466</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">4 177</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">5 801</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">4 503</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">145</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">284</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cf0"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção terciária</span></p></td><td class="cl-e1ba1cfa"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Sudeste</span></p></td><td class="cl-e1ba1cfb"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">496</span></p></td><td class="cl-e1ba1d05"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 512,3</span></p></td><td class="cl-e1ba1d0e"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">291 116</span></p></td><td class="cl-e1ba1d18"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">20 294</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">24 344</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">28 372</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">27 631</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 241</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">2 438</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cbf"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção primária</span></p></td><td class="cl-e1ba1cc8"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Sul</span></p></td><td class="cl-e1ba1cd2"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 132</span></p></td><td class="cl-e1ba1cdc"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">445,2</span></p></td><td class="cl-e1ba1cdd"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">194 062</span></p></td><td class="cl-e1ba1ce6"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">3 234</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">4 271</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">6 083</span></p></td><td class="cl-e1ba1ce7"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">11 052</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">328</span></p></td><td class="cl-e1ba1cd3"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">645</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1cf0"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção secundária</span></p></td><td class="cl-e1ba1cfa"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Sul</span></p></td><td class="cl-e1ba1cfb"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">769</span></p></td><td class="cl-e1ba1d05"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">519,9</span></p></td><td class="cl-e1ba1d0e"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">25 397</span></p></td><td class="cl-e1ba1d18"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">4 072</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">4 016</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">5 132</span></p></td><td class="cl-e1ba1d19"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">3 743</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">135</span></p></td><td class="cl-e1ba1d04"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">265</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-e1ba1d22"><p class="cl-e1b9f306"><span class="cl-e1b5652a">atenção terciária</span></p></td><td class="cl-e1ba1d23"><p class="cl-e1b9f306"><span class="cl-e1b5652a">Sul</span></p></td><td class="cl-e1ba1d2c"><p class="cl-e1b9f306"><span class="cl-e1b5652a">prop_psi_muni</span></p></td><td class="cl-e1ba1d2d"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">321</span></p></td><td class="cl-e1ba1d36"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">55,2</span></p></td><td class="cl-e1ba1d37"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">241 672</span></p></td><td class="cl-e1ba1d40"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">14 990</span></p></td><td class="cl-e1ba1d4a"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">18 347</span></p></td><td class="cl-e1ba1d4a"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">22 528</span></p></td><td class="cl-e1ba1d4a"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">26 637</span></p></td><td class="cl-e1ba1d2d"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">1 487</span></p></td><td class="cl-e1ba1d2d"><p class="cl-e1b9f31a"><span class="cl-e1b5652a">2 925</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</section>
+</section>
+<section id="modelo-de-anova-fatorail" class="level1">
+<h1>Modelo de anova fatorail</h1>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Converting to factor: nivel_atencao, regiao</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Contrasts set to contr.sum for the following variables: nivel_atencao, regiao</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(parameter)`</code></pre>
+</div>
+</div>
+<section id="checando-pressupostos" class="level3">
+<h3 class="anchored" data-anchor-id="checando-pressupostos">Checando pressupostos</h3>
+</section>
+<section id="contrastes-das-médias-marginais-com-bootstrapping" class="level2">
+<h2 class="anchored" data-anchor-id="contrastes-das-médias-marginais-com-bootstrapping">Contrastes das médias marginais com bootstrapping</h2>
+<section id="efeitos-de-interação" class="level3">
+<h3 class="anchored" data-anchor-id="efeitos-de-interação">Efeitos de interação</h3>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>NOTE: Results may be misleading due to involvement in interactions</code></pre>
+</div>
+</div>
+<section id="tamanho-de-efeito-das-diferenças-entre-os-grupos" class="level4">
+<h4 class="anchored" data-anchor-id="tamanho-de-efeito-das-diferenças-entre-os-grupos">Tamanho de efeito das diferenças entre os grupos</h4>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>NOTE: Results may be misleading due to involvement in interactions</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+</section>
+<section id="reporte" class="level1">
+<h1>Reporte</h1>
+<section id="procedimentos-de-análise" class="level2">
+<h2 class="anchored" data-anchor-id="procedimentos-de-análise">Procedimentos de análise</h2>
+<p>Foi realizada uma ANOVA fatorial (3x5) para avaliar em que medida a cobertura de psicólogos difere entre os níveis assistenciais (primário, secundário e terciário) a depender da região (Centro-Oeste, Norte, Nordeste, Sudeste e Sul). A normalidade dos resíduos foi analisada por meio do teste de Kolmogorov-Smirnov com correção de Lilliefors e a homogeneidade de variâncias foi avaliado pelo teste de Levene. Realizaram-se análises dos contrastes para os efeitos principais e de interação (nível assistencial*região) a partir das médias marginais estimadas. Procedimentos de bootstrapping (2000 re-amostragens; 95% IC BCa) foram implementados para se obter uma maior confiabilidade dos resultados, corrigir desvios de normalidade da distribuição da amostra e diferenças entre os tamanhos dos grupos e para apresentar um intervalo de confiança de 95% para as diferenças entre as médias (Haukoos &amp; Lewis, 2005). A análise foi realizada no software R (R Core Team, 2025)</p>
+</section>
+<section id="resultados" class="level2">
+<h2 class="anchored" data-anchor-id="resultados">Resultados</h2>
+<p>Os testes de Kolmogorov-Smirnov com correção de Lilliefors (<em>D</em> = 0,2; <em>p</em> &lt; 0,001) e o teste de Levene (<em>F</em>(14, 9966)= 81; <em>p</em> &lt; 0,001) indicaram, respectivamente, a ausência de normalidade dos resíduos e de homogeneidade de variâncias.</p>
+<p>Os resultados da ANOVA demonstraram que houve um efeito estatisticamente significativo para nível de atenção (<em>F</em>(2, 9966) = 594,7; <em>p</em> &lt; 0,001, <em>partial</em> ω² = 0,106), para região (<em>F</em>(4, 9966) = 29,640; <em>p</em> &lt; 0,001, <em>partial</em> ω² = 0,011), bem como para a interação entre estas duas variáveis (<em>F</em>(8, 9966 ) = 15,167, <em>p</em> &lt; 0,001, <em>partial</em> ω² = 0,011).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-fcdc1d58{}.cl-fcc6a356{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-fccff5b4{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-fccff5e6{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-fcd03f9c{width:1.695in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd03fba{width:1.645in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd03fce{width:0.583in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd03ff6{width:0.752in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd0400a{width:1.338in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd0401e{width:1.695in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd0403c{width:1.645in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd04046{width:0.583in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd0405a{width:0.752in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd0406e{width:1.338in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd04082{width:1.695in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd04096{width:1.645in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd040aa{width:0.583in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd040b4{width:0.752in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd040d2{width:1.338in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd040dc{width:1.695in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd040e6{width:1.645in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd040fa{width:0.583in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd04122{width:0.752in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fcd0412c{width:1.338in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-fcdc1d58"><thead><tr style="overflow-wrap:break-word;"><th class="cl-fcd03f9c"><p class="cl-fccff5b4"><span class="cl-fcc6a356">parameter</span></p></th><th class="cl-fcd03fba"><p class="cl-fccff5e6"><span class="cl-fcc6a356">sum_squares</span></p></th><th class="cl-fcd03fce"><p class="cl-fccff5e6"><span class="cl-fcc6a356">df</span></p></th><th class="cl-fcd03ff6"><p class="cl-fccff5e6"><span class="cl-fcc6a356">f</span></p></th><th class="cl-fcd03fce"><p class="cl-fccff5e6"><span class="cl-fcc6a356">p</span></p></th><th class="cl-fcd0400a"><p class="cl-fccff5e6"><span class="cl-fcc6a356">omega2_partial</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-fcd0401e"><p class="cl-fccff5b4"><span class="cl-fcc6a356">nivel_atencao</span></p></td><td class="cl-fcd0403c"><p class="cl-fccff5e6"><span class="cl-fcc6a356">210 580 493 207,66</span></p></td><td class="cl-fcd04046"><p class="cl-fccff5e6"><span class="cl-fcc6a356">2,00</span></p></td><td class="cl-fcd0405a"><p class="cl-fccff5e6"><span class="cl-fcc6a356">594,71</span></p></td><td class="cl-fcd04046"><p class="cl-fccff5e6"><span class="cl-fcc6a356">0,00</span></p></td><td class="cl-fcd0406e"><p class="cl-fccff5e6"><span class="cl-fcc6a356">0,11</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-fcd04082"><p class="cl-fccff5b4"><span class="cl-fcc6a356">regiao</span></p></td><td class="cl-fcd04096"><p class="cl-fccff5e6"><span class="cl-fcc6a356">20 990 496 171,12</span></p></td><td class="cl-fcd040aa"><p class="cl-fccff5e6"><span class="cl-fcc6a356">4,00</span></p></td><td class="cl-fcd040b4"><p class="cl-fccff5e6"><span class="cl-fcc6a356">29,64</span></p></td><td class="cl-fcd040aa"><p class="cl-fccff5e6"><span class="cl-fcc6a356">0,00</span></p></td><td class="cl-fcd040d2"><p class="cl-fccff5e6"><span class="cl-fcc6a356">0,01</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-fcd040dc"><p class="cl-fccff5b4"><span class="cl-fcc6a356">nivel_atencao:regiao</span></p></td><td class="cl-fcd040e6"><p class="cl-fccff5e6"><span class="cl-fcc6a356">21 481 157 637,37</span></p></td><td class="cl-fcd040fa"><p class="cl-fccff5e6"><span class="cl-fcc6a356">8,00</span></p></td><td class="cl-fcd04122"><p class="cl-fccff5e6"><span class="cl-fcc6a356">15,17</span></p></td><td class="cl-fcd040fa"><p class="cl-fccff5e6"><span class="cl-fcc6a356">0,00</span></p></td><td class="cl-fcd0412c"><p class="cl-fccff5e6"><span class="cl-fcc6a356">0,01</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+<p>Apesar de estatisticamente significativas, o efeito principal de região e o efeito de interação (nível de atenção*região) explicaram apenas cerca de 1% da variância. A variável nível de atenção, por outro lado, explicou aproximadamente 10% da variabilidade do modelo.</p>
+<p>Houve diferença significativa entre a cobertura de psicólogos da atenção primária com a terciária [IC BCa 95% -16328, -14507; <em>p</em> &nbsp;p&lt; 0,001] e da secundária com a terciária [IC BCa 95% -16112, -14156; <em>p</em> &nbsp;p&lt; 0,001].Não foram encontradas diferenças significativas entre a primária e secundária [IC BCa 95% -997, 430; <em>p</em> &nbsp;p= 0,716].</p>
+</section>
+</section>
+<section id="referências" class="level1">
+<h1>Referências</h1>
+<p>Haukoos, J. S., &amp; Lewis, R. J. (2005). Advanced statistics: Bootstrapping confidence intervals for statistics with “difficult” distributions. Academic Emergency Medicine, 12(4), 360-365. <a href="doi:10.1197/j.aem.2004.11.018" class="uri">doi:10.1197/j.aem.2004.11.018</a></p>
+<p>R Core Team (2023). <em>R: A Language and Environment for Statistical Computing</em>. R Foundation for Statistical Computing, Vienna, Austria. <a href="https://www.R-project.org/" class="uri">https://www.R-project.org/</a></p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
