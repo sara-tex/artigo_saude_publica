@@ -32,7 +32,6 @@ library(effectsize)
 library(janitor)
 ```
 
-
 ```{r}
 df <- read_csv("dados-limpo.csv") |> 
   as_factor() |> 
@@ -40,6 +39,7 @@ df <- read_csv("dados-limpo.csv") |>
 ```
 
 ## Limpeza de banco de dados
+
 ```{r}
 df_af <- df |> 
   group_by(codigo_municipio, nome_do_municipio, regiao, estado, nivel_atencao) |> 
@@ -71,8 +71,8 @@ flextable(descritivos) |>
 df_af <- mutate(df_af, ID= 1:nrow(df_af), .before= 1)
 ```
 
-
 # Modelo de anova fatorail
+
 ```{r}
 # Melhor forma
 modelo <- aov_ez(id = "ID",dv = "prop_psi_muni", 
@@ -156,6 +156,7 @@ contr_cond_regiao <- marginal_means |>
 ```
 
 # Tamanho de efeito
+
 ```{r}
 # Tamanho de efeito condicional nivel de atenção
 set.seed(123) # Para reprodutibilidade
@@ -170,12 +171,11 @@ d_cond_regiao <- df_af |>
   cohens_d(prop_psi_muni ~ regiao, var.equal = F, ci = T, ci.type = "perc", nboot = 2000)
 ```
 
-
 # Reporte
 
 ## Procedimentos de análise
 
-Foi realizada uma ANOVA fatorial (3x5) para avaliar em que medida a cobertura de psicólogos difere entre os níveis assistenciais (primário, secundário e terciário) a depender da região (Centro-Oeste, Norte, Nordeste, Sudeste e Sul). A normalidade dos resíduos foi analisada por meio do teste de Kolmogorov-Smirnov com correção de Lilliefors e a homogeneidade de variâncias foi avaliado pelo teste de Levene. Realizaram-se análises dos contrastes para os efeitos principais e de interação (nível assistencial*região) a partir das médias marginais estimadas. Procedimentos de bootstrapping (2000 re-amostragens; 95% IC) foram implementados para se obter uma maior confiabilidade dos resultados, corrigir desvios de normalidade da distribuição da amostra e diferenças entre os tamanhos dos grupos e para apresentar um intervalo de confiança de 95% para as diferenças entre as médias (Haukoos & Lewis, 2005). A análise foi realizada no software R (R Core Team, 2025)
+Foi realizada uma ANOVA fatorial (3x5) para avaliar em que medida a cobertura de psicólogos difere entre os níveis assistenciais (primário, secundário e terciário) a depender da região (Centro-Oeste, Norte, Nordeste, Sudeste e Sul). A normalidade dos resíduos foi analisada por meio do teste de Kolmogorov-Smirnov com correção de Lilliefors e a homogeneidade de variâncias foi avaliado pelo teste de Levene. Realizaram-se análises dos contrastes para os efeitos principais e de interação (nível assistencial\*região) a partir das médias marginais estimadas. Procedimentos de bootstrapping (2000 re-amostragens; 95% IC) foram implementados para se obter uma maior confiabilidade dos resultados, corrigir desvios de normalidade da distribuição da amostra e diferenças entre os tamanhos dos grupos e para apresentar um intervalo de confiança de 95% para as diferenças entre as médias (Haukoos & Lewis, 2005). A análise foi realizada no software R (R Core Team, 2025)
 
 ## Resultados
 
@@ -187,7 +187,6 @@ Os resultados da ANOVA demonstraram que houve um efeito estatisticamente signifi
 # gráfico de interação
 ```
 
-
 ```{r}
 tabela_completa |>  
   flextable() |> 
@@ -196,7 +195,7 @@ tabela_completa |>
   set_caption("Resultados da ANOVA Fatorial")
 ```
 
-Em relação à interação (nível de atenção\*região), pode-se notar que, em quase todas as regiões, houve uma diferença significativa e forte da atenção terciária com os níveis primário e secundário, mas encontrou-se apenas diferenças fracas entre a atenção primária e secundária e, no caso da região Centro-Oeste, a diferença não foi significativa (IC Bca 95% -743,38, 1424,86; *d* \= 0,04). A região, norte teve um comportamento diferenciado, pois, embora a cobertura de psicólogos tenha diferido siginificativamente nos níveis assistenciais, todas foram diferenças fracas mesmo quando se comparada a atenção terciária com os outros níveis assitenciais (ver tabela X).
+Em relação à interação (nível de atenção\*região), pode-se notar que, em quase todas as regiões, houve uma diferença significativa e forte da atenção terciária com os níveis primário e secundário, mas encontrou-se apenas diferenças fracas entre a atenção primária e secundária e, no caso da região Centro-Oeste, a diferença não foi significativa (IC Bca 95% -743,38, 1424,86; *d* = 0,04). A região, norte teve um comportamento diferenciado, pois, embora a cobertura de psicólogos tenha diferido siginificativamente nos níveis assistenciais, todas foram diferenças fracas mesmo quando se comparada a atenção terciária com os outros níveis assitenciais (ver tabela X).
 
 ```{r}
 # tabela de contrastes para nível de atenção
@@ -217,7 +216,7 @@ tabela_constrate_nivel_atencao <- contr_cond_nivel_atencao |>
 tabela_constrate_nivel_atencao
 ```
 
-As comparações inter-regionais indicaram que não houve diferenças significativas na cobertura de psicólogos na atenção terciária (ver tabela y). As únicas exceções foram entre Centro-Oeste e Sudeste [IC Bca 95% -11903,53, -3340,70, *d* \= 0,33], Sudeste e Sul [IC Bca 95% 1833,25, 9523,81, *d* \= 0,22] e entre Nordeste e Sudeste [IC Bca 95% -7413,19, -379,14, *d* \= 0,15]. As maiores desigualdades regionais foram identificadas na atenção secundária, na qual a região Norte apresentou indicadores significativamente superiores e fortes em relação ao Sul [IC Bca 95% 9265,53, 11977,72, *d* \= 1,37], Sudeste [IC Bca 95% 8550,88, 11219,13, *d* \= 1,25]. Observou-se ainda um efeito grande para a diferença entre Centro-Oeste e Norte no nível secundário [IC Bca 95% -10387,07, -7423,49, *d* \= - 1,07] e moderado na comparação entre Nordeste e Norte [IC Bca 95% -7247,56, -4427,93, *d* \= - 0,65]. No que tange a atenção primária, encontrou-se diferenças significativas entre todas as regiões, exceto a comparação de Centro-Oeste com Sudeste [IC Bca 95% -1087,47, 1008,40, *d* \< 0,001]. Além disso a região norte manteve-se consistentemente com indicadores superiores, principalmente quando caparada com a região Sul [IC Bca 95% 4910,70, 8208,73, *d* \= 0,48]. 
+As comparações inter-regionais indicaram que não houve diferenças significativas na cobertura de psicólogos na atenção terciária (ver tabela y). As únicas exceções foram entre Centro-Oeste e Sudeste \[IC Bca 95% -11903,53, -3340,70, *d* = 0,33\], Sudeste e Sul \[IC Bca 95% 1833,25, 9523,81, *d* = 0,22\] e entre Nordeste e Sudeste \[IC Bca 95% -7413,19, -379,14, *d* = 0,15\]. As maiores desigualdades regionais foram identificadas na atenção secundária, na qual a região Norte apresentou indicadores significativamente superiores e fortes em relação ao Sul \[IC Bca 95% 9265,53, 11977,72, *d* = 1,37\], Sudeste \[IC Bca 95% 8550,88, 11219,13, *d* = 1,25\]. Observou-se ainda um efeito grande para a diferença entre Centro-Oeste e Norte no nível secundário \[IC Bca 95% -10387,07, -7423,49, *d* = - 1,07\] e moderado na comparação entre Nordeste e Norte \[IC Bca 95% -7247,56, -4427,93, *d* = - 0,65\]. No que tange a atenção primária, encontrou-se diferenças significativas entre todas as regiões, exceto a comparação de Centro-Oeste com Sudeste \[IC Bca 95% -1087,47, 1008,40, *d* \< 0,001\]. Além disso a região norte manteve-se consistentemente com indicadores superiores, principalmente quando caparada com a região Sul \[IC Bca 95% 4910,70, 8208,73, *d* = 0,48\].
 
 ```{r}
 # tabela de constrastes por região
@@ -243,9 +242,6 @@ tabela_constrate_regiao
 # gráfico da interação
 # boxplot
 ```
-
-
-
 
 # Referências
 
