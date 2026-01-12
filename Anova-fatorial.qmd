@@ -247,4 +247,4 @@ tabela_constrate_regiao
 
 Haukoos, J. S., & Lewis, R. J. (2005). Advanced statistics: Bootstrapping confidence intervals for statistics with “difficult” distributions. Academic Emergency Medicine, 12(4), 360-365. <doi:10.1197/j.aem.2004.11.018>
 
-R Core Team (2023). *R: A Language and Environment for Statistical Computing*. R Foundation for Statistical Computing, Vienna, Austria. <https://www.R-project.org/>
+R Core Team (2025). _R: A Language and Environment for Statistical Computing_. R Foundation for Statistical. Computing, Vienna, Austria. <https://www.R-project.org/>
